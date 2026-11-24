@@ -1,10 +1,26 @@
 {
-  "source_row_accounting": true,
-  "order_count": true,
-  "net_revenue_reconciles": true,
-  "refunds_reconcile": true,
-  "contribution_reconciles": true,
-  "category_revenue_reconciles": true,
-  "annual_revenue_reconciles": true,
-  "rates_bounded": true
+  "dataset_id": "6f161fca7f6e0d53e65c46502d4aa119ae847731a214bab5ab3f7d43823da530",
+  "raw_rows": 1067371,
+  "accepted_rows": 1027016,
+  "duplicate_rows": 34147,
+  "invalid_rows": 6208,
+  "missing_customer_rows": 229201,
+  "totals": {
+    "SalesPence": 2047626043,
+    "CancellationPence": 146242418,
+    "AdjustmentPence": 0,
+    "NetPence": 1901383625,
+    "SaleInvoices": 40077,
+    "Countries": 43,
+    "FirstDate": "2009-12-01",
+    "LastDate": "2011-12-09"
+  },
+  "checks": {
+    "source_row_accounting": true,
+    "full_published_dataset": true,
+    "monetary_bridge": true,
+    "monthly_reconciliation": true,
+    "country_reconciliation": true,
+    "accepted_count_matches_database": true
+  }
 }

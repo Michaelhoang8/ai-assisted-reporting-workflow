@@ -27,18 +27,18 @@ def verify(packet,summary):
 def display(m):
  value=m['value']
  if value is None:return 'Unavailable'
- if m['unit']=='CAD cents':return f'CAD ${value/100:,.2f}'
+ if m['unit']=='GBP pence':return f'GBP {value/100:,.2f}'
  if m['unit']=='ratio':return f'{value:.2%}'
  return f"{value:,} {m['unit']}"
 def render(packet,summary,result):
- text=['# AI-assisted management report','','Synthetic portfolio case. This summary was authored by the AI assistant from the local evidence packet. Structured numbers were checked in code; qualitative judgments require human review.','',f"Dataset fingerprint: `{packet['dataset_id']}`",'','## Verified evidence','']
+ text=['# AI-assisted management report','','Real UCI Online Retail II records. This summary was authored by the AI assistant from the local evidence packet. Structured numbers were checked in code; qualitative judgments require human review.','',f"Dataset fingerprint: `{packet['dataset_id']}`",'','## Verified evidence','']
  for c in summary['claims']:
   m=packet['metrics'][c['metric_id']];text.append(f"- **{m['label']}: {display(m)}.** Scope: {m['scope']}. Evidence ID: `{c['metric_id']}`.")
  for section,title in [('interpretations','Interpretation — review required'),('recommendations','Recommended next steps — review required')]:
   text+=['','## '+title,'']
   for item in summary[section]:text.append('- '+item['text']+' Evidence: '+', '.join('`'+k+'`' for k in item['evidence_ids'])+'.')
  text+=['','## Limitations','']+['- '+x for x in packet['limitations']]
- text+=['','Contribution excludes advertising, fixed overhead and tax. Returns are attributed retrospectively to the original order month. This is not a cash-flow or accounting close report.','',f"Validation: {result['numeric_claims_verified']} structured metric claims passed. No external model API or production workflow was invoked."]
+ text+=['','Recorded sales and cancellation line values are not profit or cash flow. Cancellations remain in their recorded invoice month.','',f"Validation: {result['numeric_claims_verified']} structured metric claims passed. No external model API or production workflow was invoked."]
  return '\n'.join(text)+'\n'
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--evidence',type=Path,default=ROOT/'reports/evidence_packet.json');p.add_argument('--summary',type=Path,default=ROOT/'ai/summary.json');p.add_argument('--output',type=Path,default=ROOT/'reports');a=p.parse_args()

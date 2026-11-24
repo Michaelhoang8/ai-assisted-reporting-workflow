@@ -1,7 +1,7 @@
 {
-  "dataset_id": "05f38a15b79643409e99e37c10a3ce7a5433b50beda958b6b8fc035fffa95eaa",
+  "dataset_id": "6f161fca7f6e0d53e65c46502d4aa119ae847731a214bab5ab3f7d43823da530",
   "dataset_match": true,
-  "numeric_claims_verified": 15,
+  "numeric_claims_verified": 12,
   "prose_review": "Human review required; evidence links do not establish causality",
   "status": "structured claims passed"
 }

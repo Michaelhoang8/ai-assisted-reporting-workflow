@@ -1,28 +1,32 @@
 {
-  "captured_at": "2026-11-24T18:09:19.627992+00:00",
+  "captured_at": "2026-11-24T19:56:10.293558+00:00",
   "source": "Actual reports/dashboard.html browser render",
   "recording": "Automated browser walkthrough, not manual development footage",
   "page_errors": [],
   "screenshots": [
     {
       "file": "dashboard.png",
-      "sha256": "0a1b41a3a5c3a871af417d34bf0ebd9c35d5675b9cc554db6e68b9bee5d64f76"
+      "sha256": "4989a3a5f30f714450bface829288b3c144598ca6ce50e73a8a1705a25a3051c"
     },
     {
       "file": "filtered.png",
-      "sha256": "22f2b1b417b4bae54917871ff3187fdede8a124c96f9e4681a85a911820c942a"
+      "sha256": "febabf562cf82f8b1ef1cc9f1fb0046ab4493a6fabc91d5c8b17e02927e54950"
     },
     {
       "file": "detail-1.png",
-      "sha256": "22f2b1b417b4bae54917871ff3187fdede8a124c96f9e4681a85a911820c942a"
+      "sha256": "febabf562cf82f8b1ef1cc9f1fb0046ab4493a6fabc91d5c8b17e02927e54950"
     },
     {
       "file": "detail-2.png",
-      "sha256": "9beac3945ac89005e7c903ff3aa861525e4ee0d158ce0ee558338fc15136ba65"
+      "sha256": "2a7cba32c7a77d12df45a8a04e2e7c44ae68065def859d492643437c6e022399"
     },
     {
       "file": "detail-3.png",
-      "sha256": "ce982cea16437c6b3fcdfcdd6ff56691ab2594d4a32e8d7754588655f1614e52"
+      "sha256": "2a7cba32c7a77d12df45a8a04e2e7c44ae68065def859d492643437c6e022399"
+    },
+    {
+      "file": "detail-4.png",
+      "sha256": "19fe4eda2da4784e409b85ba7fc4eee60b750020b93b14cd97a1341d33f5ff47"
     }
   ]
 }

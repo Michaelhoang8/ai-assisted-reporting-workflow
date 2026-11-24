@@ -1,116 +1,61 @@
-"""Local reproducible SQL analytics. Raw data is untrusted input, not AI instructions."""
-import argparse,csv,datetime as dt,hashlib,json,sqlite3,sys
+"""Analyze the full UCI Online Retail II extract without model API calls."""
+import csv,gzip,hashlib,json,sqlite3,datetime
+from decimal import Decimal,ROUND_HALF_UP
 from pathlib import Path
-from generate_data import HEADERS,CHANNELS
 ROOT=Path(__file__).resolve().parents[1]
-NUMERIC=HEADERS[5:]
-def write_csv(path,headers,rows):
- with path.open('w',newline='',encoding='utf-8') as f:
-  w=csv.writer(f);w.writerow(headers);w.writerows(rows)
-def read_validated(raw):
- accepted=[];issues=[];seen={};count=0
- with raw.open(newline='',encoding='utf-8-sig') as f:
-  reader=csv.DictReader(f)
-  if reader.fieldnames!=HEADERS:raise ValueError('Unexpected source schema')
-  for line,row in enumerate(reader,2):
-   count+=1;key=row['OrderID'];reasons=[]
+def classify(row):
+ qty=int(row['Quantity']);price=Decimal(row['Price']).quantize(Decimal('.000001'));invoice=row['Invoice'].strip()
+ datetime.datetime.fromisoformat(row['InvoiceDate'])
+ if not price.is_finite() or price<=0:raise ValueError('Nonpositive price')
+ if qty==0:raise ValueError('Zero quantity')
+ if not invoice or not row['StockCode']:raise ValueError('Missing invoice or product')
+ cancel=invoice.upper().startswith('C')
+ if cancel and qty>=0:raise ValueError('Cancellation without negative quantity')
+ kind='Cancellation' if cancel else 'Adjustment' if qty<0 else 'Sale'
+ amount=int((price*qty*100).quantize(Decimal('1'),rounding=ROUND_HALF_UP))
+ return invoice,row['InvoiceDate'][:10],row['Country'].strip() or 'Unknown',row['StockCode'],row['CustomerID'],qty,amount,kind
+def main():
+ source=ROOT/'data/source/retail_lines.csv.gz';db=sqlite3.connect(ROOT/'reports/analytics.sqlite')
+ db.executescript('DROP TABLE IF EXISTS Lines; CREATE TABLE Lines(Invoice TEXT,Date TEXT,Country TEXT,Product TEXT,Customer TEXT,Quantity INTEGER,AmountPence INTEGER,Kind TEXT,SourceSheet TEXT,SourceRow INTEGER);')
+ seen=set();batch=[];raw=accepted=duplicates=invalid=missing_customer=0;duplicate_pence=0;issues=[]
+ with gzip.open(source,'rt',encoding='utf-8',newline='') as f:
+  for row in csv.DictReader(f):
+   raw+=1
+   key=hashlib.sha256(json.dumps([row[k] for k in ['Invoice','StockCode','Description','Quantity','InvoiceDate','Price','CustomerID','Country']],ensure_ascii=False).encode()).digest()
+   try:record=classify(row)
+   except (ValueError,ArithmeticError) as exc:
+    invalid+=1;issues.append([row['SourceSheet'],row['SourceRow'],str(exc)]);continue
    if key in seen:
-    if row!=seen[key]:raise ValueError(f'Conflicting duplicate OrderID {key}; source correction required')
-    reasons.append('Exact duplicate OrderID')
-   seen[key]=row.copy();typed=row.copy()
-   for field,value in row.items():
-    try:
-     if value is None or value.strip()=='':raise ValueError('blank')
-     if field in NUMERIC:typed[field]=int(value)
-     elif field=='OrderDate':typed[field]=dt.date.fromisoformat(value).isoformat()
-     else:typed[field]=value.strip()
-    except (ValueError,AttributeError):reasons.append('Invalid or missing '+str(field))
-   if not reasons:
-    if typed['Channel'] not in CHANNELS:reasons.append('Unknown channel')
-    if typed['Category'] not in ('Home','Outdoor','Accessories'):reasons.append('Unknown category')
-    if not (typed['ProductID'].startswith('P') and typed['ProductID'][1:].isdigit() and 1<=int(typed['ProductID'][1:])<=30):reasons.append('Unknown product')
-    elif typed['Category']!=['Home','Outdoor','Accessories'][(int(typed['ProductID'][1:])-1)%3]:reasons.append('Product category mismatch')
-    if typed['Quantity']<=0:reasons.append('Nonpositive quantity')
-    if not 0<=typed['ReturnedUnits']<=typed['Quantity']:reasons.append('Returned units outside quantity')
-    if min(typed[k] for k in ['UnitPriceCents','DiscountCents','UnitCostCents','ShippingCostCents'])<0:reasons.append('Negative monetary value')
-    if typed['DiscountCents']>typed['Quantity']*typed['UnitPriceCents']:reasons.append('Discount exceeds gross sales')
-   if reasons:issues.append([line,key,'; '.join(reasons),json.dumps(row)])
-   else:accepted.append([typed[h] for h in HEADERS])
- return count,accepted,issues
-
-def run(raw,out):
- raw=Path(raw);out=Path(out);count,rows,issues=read_validated(raw)
- if not rows:raise ValueError('No accepted source rows')
- db=sqlite3.connect(':memory:')
- ddl=','.join(h+(' INTEGER' if h in NUMERIC else ' TEXT')+(' PRIMARY KEY' if h=='OrderID' else '') for h in HEADERS)
- db.execute('CREATE TABLE Orders('+ddl+')');db.executemany('INSERT INTO Orders VALUES ('+','.join('?' for _ in HEADERS)+')',rows)
- db.executescript((ROOT/'sql/analysis.sql').read_text())
+    duplicates+=1;duplicate_pence+=record[6];issues.append([row['SourceSheet'],row['SourceRow'],'Exact repeated source fields; excluded by declared deduplication policy']);continue
+   seen.add(key);accepted+=1;missing_customer+=not bool(record[4]);batch.append((*record,row['SourceSheet'],int(row['SourceRow'])))
+   if len(batch)>=10000:db.executemany('INSERT INTO Lines VALUES(?,?,?,?,?,?,?,?,?,?)',batch);batch=[]
+ if batch:db.executemany('INSERT INTO Lines VALUES(?,?,?,?,?,?,?,?,?,?)',batch)
+ db.executescript((ROOT/'sql/analysis.sql').read_text(encoding='utf-8'));db.commit()
  def query(sql):
-  cur=db.execute(sql);return [dict(zip([c[0] for c in cur.description],r)) for r in cur.fetchall()]
- monthly=query('SELECT * FROM MonthlyChannelPerformance ORDER BY Month,Channel')
- annual=query('SELECT * FROM AnnualChannelComparison ORDER BY Year,Channel')
- categories=query('SELECT * FROM CategoryPerformance ORDER BY Year,Category')
- # Independent integer/decimal reconciliation; no reuse of SQL's calculated monetary fields.
- from decimal import Decimal,ROUND_HALF_UP
- gross=discount=refund=cost=shipping=0
- for row in rows:
-  r=dict(zip(HEADERS,row));g=r['Quantity']*r['UnitPriceCents'];gross+=g;discount+=r['DiscountCents']
-  refund+=int((Decimal(g-r['DiscountCents'])*r['ReturnedUnits']/r['Quantity']).quantize(Decimal('1'),rounding=ROUND_HALF_UP))
-  cost+=r['Quantity']*r['UnitCostCents'];shipping+=r['ShippingCostCents']
- net=gross-discount-refund
- checks={'source_row_accounting':count==len(rows)+len(issues),'order_count':sum(r['Orders'] for r in monthly)==len(rows),
- 'net_revenue_reconciles':sum(r['NetRevenueCents'] for r in monthly)==net,
- 'refunds_reconcile':sum(r['RefundCents'] for r in monthly)==refund,
- 'contribution_reconciles':sum(r['ContributionCents'] for r in monthly)==net-cost-shipping,
- 'category_revenue_reconciles':sum(r['NetRevenueCents'] for r in categories)==net,
- 'annual_revenue_reconciles':sum(r['NetRevenueCents'] for r in annual)==net,
- 'rates_bounded':all(0<=r['ReturnedUnits']<=r['Units'] for r in monthly)}
- if not all(checks.values()):raise AssertionError(checks)
- def total(year,key,channel=None,half=None):return sum(r[key] for r in monthly if r['Year']==str(year) and (channel is None or r['Channel']==channel) and (half is None or (int(r['Month'][-2:])>6)==(half==2)))
- def ratio(a,b):return a/b if b else None
- facts={}
- def metric(key,label,value,unit,scope):facts[key]={'label':label,'value':value,'unit':unit,'scope':scope}
- metric('accepted_orders','Accepted orders',len(rows),'orders','All source dates')
- metric('quality_exceptions','Quarantined source rows',len(issues),'rows','All source dates')
- for year in (2024,2025):
-  revenue=total(year,'NetRevenueCents');contribution=total(year,'ContributionCents')
-  metric(f'revenue_{year}',f'{year} net revenue',revenue,'CAD cents',f'FY{year}, all channels')
-  metric(f'contribution_{year}',f'{year} contribution',contribution,'CAD cents',f'FY{year}, all channels')
-  metric(f'margin_{year}',f'{year} contribution margin',ratio(contribution,revenue),'ratio',f'FY{year}, all channels')
-  metric(f'return_rate_{year}',f'{year} returned-unit rate',ratio(total(year,'ReturnedUnits'),total(year,'Units')),'ratio',f'FY{year}, all channels')
- metric('revenue_yoy','Net revenue year-over-year',ratio(total(2025,'NetRevenueCents')-total(2024,'NetRevenueCents'),total(2024,'NetRevenueCents')),'ratio','FY2025 versus FY2024, all channels')
- for half in (1,2):
-  scope=f'FY2025 H{half}, Paid Search';rev=total(2025,'NetRevenueCents','Paid Search',half)
-  metric(f'paid_h{half}_margin',f'Paid Search H{half} contribution margin',ratio(total(2025,'ContributionCents','Paid Search',half),rev),'ratio',scope)
-  metric(f'paid_h{half}_return_rate',f'Paid Search H{half} returned-unit rate',ratio(total(2025,'ReturnedUnits','Paid Search',half),total(2025,'Units','Paid Search',half)),'ratio',scope)
-  metric(f'paid_h{half}_discount_rate',f'Paid Search H{half} discount share of gross sales',ratio(total(2025,'DiscountCents','Paid Search',half),total(2025,'GrossSalesCents','Paid Search',half)),'ratio',scope)
- fingerprint=hashlib.sha256(raw.read_bytes()+Path(__file__).read_bytes()+(ROOT/'sql/analysis.sql').read_bytes()).hexdigest()
- packet={'dataset_id':fingerprint,'provenance':'Synthetic e-commerce data, seed 2026; not an employer dataset','metrics':facts,
- 'definitions':{'net_revenue':'Gross sales minus discounts minus refunds','contribution':'Net revenue minus all original product cost and shipping; excludes acquisition cost, tax and fixed overhead','return_rate':'Returned units divided by sold units; lifetime returns attributed to order month','reporting_basis':'Retrospective order-cohort analysis; not an as-of cash or general-ledger report'},
- 'limitations':['No measured savings or causal effect','Returned goods assumed unsellable; original product cost retained','No advertising spend, customer IDs or causal experiment','Paid Search second-half discount and return pressure deliberately seeded','All AI interpretations require human review']}
- out.mkdir(parents=True,exist_ok=True)
- # Never leave an old AI report beside a changed dataset as if it were current.
- ai_validation=out/'ai_summary_validation.json'
- summary_current=False
- if ai_validation.exists():
-  summary_current=json.loads(ai_validation.read_text()).get('dataset_id')==fingerprint
-  if not summary_current:
-   for artifact in ('ai_summary_validation.json','ai_management_report.md'):
-    (out/artifact).unlink(missing_ok=True)
- write_csv(out/'clean_orders.csv',HEADERS,rows)
- write_csv(out/'data_quality_exceptions.csv',['Line','OrderID','Reason','RawRecord'],issues)
- for name,data in [('monthly_channel_performance',monthly),('annual_channel_comparison',annual),('category_performance',categories)]:
-  if data:write_csv(out/(name+'.csv'),list(data[0]),[list(r.values()) for r in data])
- (out/'evidence_packet.json').write_text(json.dumps(packet,indent=2))
- (out/'validation_results.json').write_text(json.dumps(checks,indent=2))
- (out/'dashboard_data.json').write_text(json.dumps(monthly,indent=2))
- template=(ROOT/'src/dashboard_template.html').read_text(encoding='utf-8')
- (out/'dashboard.html').write_text(template.replace('__DATA__',json.dumps(monthly)),encoding='utf-8')
- db.commit();dest=sqlite3.connect(out/'analytics.sqlite');db.backup(dest);dest.close();db.close()
- manifest={'dataset_id':fingerprint,'raw_rows':count,'accepted_rows':len(rows),'quarantined_rows':len(issues),'checks_passed':len(checks),'ai_summary_status':'current verified summary retained' if summary_current else 'awaiting evidence-linked AI summary'}
- (out/'run_manifest.json').write_text(json.dumps(manifest,indent=2))
- return manifest
-if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--raw',type=Path,default=ROOT/'data/raw/orders.csv');p.add_argument('--output',type=Path,default=ROOT/'reports');a=p.parse_args()
- try:print(json.dumps(run(a.raw,a.output),indent=2))
- except Exception as e:print('Pipeline failed: '+str(e),file=sys.stderr);sys.exit(1)
+  c=db.execute(sql);return [dict(zip([x[0] for x in c.description],r)) for r in c]
+ monthly=query('SELECT * FROM MonthlyCountry ORDER BY Month,Country');countries=query('SELECT Country,SUM(AmountPence) NetPence,COUNT(*) LineCount FROM Lines GROUP BY Country ORDER BY NetPence DESC');products=query("SELECT Product,SUM(AmountPence) NetPence,COUNT(DISTINCT Invoice) Invoices FROM Lines GROUP BY Product ORDER BY NetPence DESC LIMIT 25")
+ totals=query("SELECT SUM(CASE WHEN Kind='Sale' THEN AmountPence ELSE 0 END) SalesPence,SUM(CASE WHEN Kind='Cancellation' THEN -AmountPence ELSE 0 END) CancellationPence,SUM(CASE WHEN Kind='Adjustment' THEN AmountPence ELSE 0 END) AdjustmentPence,SUM(AmountPence) NetPence,COUNT(DISTINCT CASE WHEN Kind='Sale' THEN Invoice END) SaleInvoices,COUNT(DISTINCT Country) Countries,MIN(Date) FirstDate,MAX(Date) LastDate FROM Lines")[0]
+ checks={'source_row_accounting':raw==accepted+duplicates+invalid,'full_published_dataset':raw==1067371,'monetary_bridge':totals['NetPence']==totals['SalesPence']-totals['CancellationPence']+totals['AdjustmentPence'],'monthly_reconciliation':sum(r['NetPence'] for r in monthly)==totals['NetPence'],'country_reconciliation':sum(r['NetPence'] for r in countries)==totals['NetPence'],'accepted_count_matches_database':db.execute('SELECT COUNT(*) FROM Lines').fetchone()[0]==accepted}
+ assert all(checks.values()),checks
+ with gzip.open(ROOT/'reports/data_quality_exceptions.csv.gz','wt',encoding='utf-8',newline='') as f:w=csv.writer(f);w.writerow(['SourceSheet','SourceRow','Reason']);w.writerows(issues)
+ def export(name,rows):
+  with (ROOT/'reports'/name).open('w',newline='',encoding='utf-8') as f:w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
+ export('monthly_country.csv',monthly);export('country_summary.csv',countries);export('top_products.csv',products)
+ dataset_id=hashlib.sha256(source.read_bytes()+Path(__file__).read_bytes()+(ROOT/'sql/analysis.sql').read_bytes()).hexdigest()
+ metrics={}
+ for key,value in {**totals,'SourceRows':raw,'AcceptedRows':accepted,'ExcludedRepeats':duplicates,'ExcludedInvalid':invalid,'MissingCustomerRows':missing_customer,'RepeatedLinePence':duplicate_pence}.items():
+  if isinstance(value,int):metrics[key]={'value':value,'unit':'GBP pence' if key.endswith('Pence') else 'count','label':key,'scope':totals['FirstDate']+' to '+totals['LastDate']+'; deduplicated valid-price lines unless explicitly source/exclusion count'}
+ limitations=['Real historical records from a UK retailer; not current market conditions.','Exact repeated fields are removed as a disclosed analysis assumption; distinct identical purchases cannot be resolved from this source. RepeatedLinePence measures sensitivity to that choice.','C-prefixed invoices are cancellations, not necessarily completed cash refunds or matched physical returns.','No product costs, discounts, advertising channels, inventory balances or payment terms are available; no profit or AP aging is inferred.','Missing customers are retained for transaction value; customer analyses would require an identified-customer subset.','Final December is partial; do not compare it with full calendar months. Source prices are normalized to six decimal places to remove spreadsheet binary artifacts, then each line is rounded to pence half-up.']
+ packet={'dataset_id':dataset_id,'provenance':'Daqing Chen, Online Retail II, UCI, DOI 10.24432/C5CG6D, CC BY 4.0','metrics':metrics,'limitations':limitations}
+ (ROOT/'reports/evidence_packet.json').write_text(json.dumps(packet,indent=2),encoding='utf-8')
+ manifest={'dataset_id':dataset_id,'raw_rows':raw,'accepted_rows':accepted,'duplicate_rows':duplicates,'invalid_rows':invalid,'missing_customer_rows':missing_customer,'totals':totals,'checks':checks}
+ (ROOT/'reports/validation_results.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
+ payload={'monthly':monthly,'countries':countries,'products':products,'validation':manifest}
+ (ROOT/'reports/dashboard_data.json').write_text(json.dumps(payload),encoding='utf-8')
+ template=(ROOT/'src/dashboard_template.html').read_text(encoding='utf-8');(ROOT/'reports/dashboard.html').write_text(template.replace('__DATA__',json.dumps(payload)),encoding='utf-8')
+ # Never let an earlier verified report survive a changed evidence fingerprint.
+ v=ROOT/'reports/ai_summary_validation.json'
+ if v.exists() and json.loads(v.read_text())['dataset_id']!=dataset_id:
+  v.unlink();(ROOT/'reports/ai_management_report.md').unlink(missing_ok=True)
+ db.close();print(json.dumps(manifest,indent=2))
+if __name__=='__main__':main()

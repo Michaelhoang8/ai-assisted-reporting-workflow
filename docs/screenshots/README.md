@@ -11,3 +11,5 @@ Actual browser captures. Excel-prefixed images, when present, are workbook rende
 ![detail-2.png](detail-2.png)
 
 ![detail-3.png](detail-3.png)
+
+![detail-4.png](detail-4.png)

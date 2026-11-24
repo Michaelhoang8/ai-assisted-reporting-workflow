@@ -1,0 +1,15 @@
+{
+  "publisher": "Daqing Chen / UCI, CC BY 4.0",
+  "source_page": "https://doi.org/10.24432/C5CG6D",
+  "download_url": "https://archive.ics.uci.edu/static/public/502/online%2Bretail%2Bii.zip",
+  "downloaded_at_utc": "2026-11-24T19:41:37.642293+00:00",
+  "original_bytes": 45622418,
+  "original_sha256": "572e36277c2390fbfde10664750731e0a86f55e33470d91919085f0408e67bfb",
+  "stored_file": "online_retail_ii.zip",
+  "stored_sha256": "572e36277c2390fbfde10664750731e0a86f55e33470d91919085f0408e67bfb",
+  "units": "GBP",
+  "data_type": "Observed public data, no generated rows",
+  "normalized_file": "retail_lines.csv.gz",
+  "normalized_rows": 1067371,
+  "normalized_sha256": "0c490acf77d72dde1821f43c944cc358a9db84591fb01b8582cf43f788167ed1"
+}

@@ -1,141 +1,110 @@
 {
-  "dataset_id": "05f38a15b79643409e99e37c10a3ce7a5433b50beda958b6b8fc035fffa95eaa",
+  "dataset_id": "6f161fca7f6e0d53e65c46502d4aa119ae847731a214bab5ab3f7d43823da530",
   "claims": [
     {
-      "metric_id": "accepted_orders",
-      "value": 60000,
-      "unit": "orders"
+      "metric_id": "SalesPence",
+      "value": 2047626043,
+      "unit": "GBP pence"
     },
     {
-      "metric_id": "quality_exceptions",
-      "value": 6,
-      "unit": "rows"
+      "metric_id": "CancellationPence",
+      "value": 146242418,
+      "unit": "GBP pence"
     },
     {
-      "metric_id": "revenue_2024",
-      "value": 342955335,
-      "unit": "CAD cents"
+      "metric_id": "AdjustmentPence",
+      "value": 0,
+      "unit": "GBP pence"
     },
     {
-      "metric_id": "revenue_2025",
-      "value": 352462697,
-      "unit": "CAD cents"
+      "metric_id": "NetPence",
+      "value": 1901383625,
+      "unit": "GBP pence"
     },
     {
-      "metric_id": "revenue_yoy",
-      "value": 0.027721866464039697,
-      "unit": "ratio"
+      "metric_id": "SaleInvoices",
+      "value": 40077,
+      "unit": "count"
     },
     {
-      "metric_id": "contribution_2024",
-      "value": 140450048,
-      "unit": "CAD cents"
+      "metric_id": "Countries",
+      "value": 43,
+      "unit": "count"
     },
     {
-      "metric_id": "contribution_2025",
-      "value": 140152490,
-      "unit": "CAD cents"
+      "metric_id": "SourceRows",
+      "value": 1067371,
+      "unit": "count"
     },
     {
-      "metric_id": "margin_2024",
-      "value": 0.4095286868769661,
-      "unit": "ratio"
+      "metric_id": "AcceptedRows",
+      "value": 1027016,
+      "unit": "count"
     },
     {
-      "metric_id": "margin_2025",
-      "value": 0.3976377959793005,
-      "unit": "ratio"
+      "metric_id": "ExcludedRepeats",
+      "value": 34147,
+      "unit": "count"
     },
     {
-      "metric_id": "paid_h1_margin",
-      "value": 0.42266433596827224,
-      "unit": "ratio"
+      "metric_id": "ExcludedInvalid",
+      "value": 6208,
+      "unit": "count"
     },
     {
-      "metric_id": "paid_h2_margin",
-      "value": 0.22704330267617712,
-      "unit": "ratio"
+      "metric_id": "MissingCustomerRows",
+      "value": 229201,
+      "unit": "count"
     },
     {
-      "metric_id": "paid_h1_return_rate",
-      "value": 0.046285289747399705,
-      "unit": "ratio"
-    },
-    {
-      "metric_id": "paid_h2_return_rate",
-      "value": 0.15363586659376707,
-      "unit": "ratio"
-    },
-    {
-      "metric_id": "paid_h1_discount_rate",
-      "value": 0.049648278883311726,
-      "unit": "ratio"
-    },
-    {
-      "metric_id": "paid_h2_discount_rate",
-      "value": 0.200000851307495,
-      "unit": "ratio"
+      "metric_id": "RepeatedLinePence",
+      "value": 43171687,
+      "unit": "GBP pence"
     }
   ],
   "interpretations": [
     {
-      "text": "Net revenue grew while contribution declined slightly and contribution margin narrowed. Revenue growth alone therefore gives an incomplete view of this scenario's commercial performance. Contribution is before advertising, fixed overhead and tax.",
+      "text": "Cancellation entries materially reduce the positive recorded sales value. They should be reviewed as a separate accounting stream rather than assumed to be matched product returns.",
       "evidence_ids": [
-        "revenue_2024",
-        "revenue_2025",
-        "revenue_yoy",
-        "contribution_2024",
-        "contribution_2025",
-        "margin_2024",
-        "margin_2025"
+        "SalesPence",
+        "CancellationPence",
+        "NetPence"
       ]
     },
     {
-      "text": "Paid Search had a lower contribution margin in the second half alongside higher discounting and returned-unit rates. These conditions were deliberately seeded in the synthetic data. Their coexistence motivates investigation but does not establish how much any individual factor caused the change.",
+      "text": "Missing customer identifiers limit customer-level analyses, while the corresponding valid transaction values remain usable in country and monthly reporting.",
       "evidence_ids": [
-        "paid_h1_margin",
-        "paid_h2_margin",
-        "paid_h1_return_rate",
-        "paid_h2_return_rate",
-        "paid_h1_discount_rate",
-        "paid_h2_discount_rate"
+        "MissingCustomerRows",
+        "AcceptedRows"
       ]
     },
     {
-      "text": "The reporting dataset excludes quarantined source rows and retains their exception evidence. Passing reconciliation establishes internal consistency of accepted records, not completeness of an external source system.",
+      "text": "Repeated source fields affect the recorded-value estimate. Deduplication is a documented analytical assumption, and the excluded amount provides a sensitivity measure.",
       "evidence_ids": [
-        "accepted_orders",
-        "quality_exceptions"
+        "ExcludedRepeats",
+        "RepeatedLinePence"
       ]
     }
   ],
   "recommendations": [
     {
-      "text": "Ask the commercial analyst to review Paid Search promotion rules, product mix and return reasons before changing discount policy. Add campaign spend and return-disposition data before estimating campaign profitability or recoverable product costs.",
+      "text": "Investigate the highest-value cancellation invoices alongside the original records before drawing conclusions about operational causes.",
       "evidence_ids": [
-        "paid_h1_margin",
-        "paid_h2_margin",
-        "paid_h1_discount_rate",
-        "paid_h2_discount_rate",
-        "paid_h1_return_rate",
-        "paid_h2_return_rate"
+        "CancellationPence"
       ]
     },
     {
-      "text": "Report contribution and contribution margin alongside revenue at each performance review. Separate a proposed controlled promotion test from the retrospective pattern shown here, and measure its results before claiming an improvement.",
+      "text": "Compare complete overlapping months when assessing trends; exclude the partial final month from full-month growth claims.",
       "evidence_ids": [
-        "revenue_yoy",
-        "contribution_2024",
-        "contribution_2025",
-        "margin_2024",
-        "margin_2025"
+        "SourceRows",
+        "SaleInvoices"
       ]
     },
     {
-      "text": "Have the data steward resolve the quarantine log and confirm upstream control totals. Retain numerical verification and manual prose review when drafting future AI-assisted reports; measure preparation and review effort before estimating time savings.",
+      "text": "Report deduplication sensitivity and customer-coverage limitations alongside any commercial recommendation.",
       "evidence_ids": [
-        "accepted_orders",
-        "quality_exceptions"
+        "RepeatedLinePence",
+        "MissingCustomerRows"
       ]
     }
   ]

@@ -1,121 +1,86 @@
 {
-  "dataset_id": "05f38a15b79643409e99e37c10a3ce7a5433b50beda958b6b8fc035fffa95eaa",
-  "provenance": "Synthetic e-commerce data, seed 2026; not an employer dataset",
+  "dataset_id": "6f161fca7f6e0d53e65c46502d4aa119ae847731a214bab5ab3f7d43823da530",
+  "provenance": "Daqing Chen, Online Retail II, UCI, DOI 10.24432/C5CG6D, CC BY 4.0",
   "metrics": {
-    "accepted_orders": {
-      "label": "Accepted orders",
-      "value": 60000,
-      "unit": "orders",
-      "scope": "All source dates"
+    "SalesPence": {
+      "value": 2047626043,
+      "unit": "GBP pence",
+      "label": "SalesPence",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     },
-    "quality_exceptions": {
-      "label": "Quarantined source rows",
-      "value": 6,
-      "unit": "rows",
-      "scope": "All source dates"
+    "CancellationPence": {
+      "value": 146242418,
+      "unit": "GBP pence",
+      "label": "CancellationPence",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     },
-    "revenue_2024": {
-      "label": "2024 net revenue",
-      "value": 342955335,
-      "unit": "CAD cents",
-      "scope": "FY2024, all channels"
+    "AdjustmentPence": {
+      "value": 0,
+      "unit": "GBP pence",
+      "label": "AdjustmentPence",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     },
-    "contribution_2024": {
-      "label": "2024 contribution",
-      "value": 140450048,
-      "unit": "CAD cents",
-      "scope": "FY2024, all channels"
+    "NetPence": {
+      "value": 1901383625,
+      "unit": "GBP pence",
+      "label": "NetPence",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     },
-    "margin_2024": {
-      "label": "2024 contribution margin",
-      "value": 0.4095286868769661,
-      "unit": "ratio",
-      "scope": "FY2024, all channels"
+    "SaleInvoices": {
+      "value": 40077,
+      "unit": "count",
+      "label": "SaleInvoices",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     },
-    "return_rate_2024": {
-      "label": "2024 returned-unit rate",
-      "value": 0.04536604880650753,
-      "unit": "ratio",
-      "scope": "FY2024, all channels"
+    "Countries": {
+      "value": 43,
+      "unit": "count",
+      "label": "Countries",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     },
-    "revenue_2025": {
-      "label": "2025 net revenue",
-      "value": 352462697,
-      "unit": "CAD cents",
-      "scope": "FY2025, all channels"
+    "SourceRows": {
+      "value": 1067371,
+      "unit": "count",
+      "label": "SourceRows",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     },
-    "contribution_2025": {
-      "label": "2025 contribution",
-      "value": 140152490,
-      "unit": "CAD cents",
-      "scope": "FY2025, all channels"
+    "AcceptedRows": {
+      "value": 1027016,
+      "unit": "count",
+      "label": "AcceptedRows",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     },
-    "margin_2025": {
-      "label": "2025 contribution margin",
-      "value": 0.3976377959793005,
-      "unit": "ratio",
-      "scope": "FY2025, all channels"
+    "ExcludedRepeats": {
+      "value": 34147,
+      "unit": "count",
+      "label": "ExcludedRepeats",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     },
-    "return_rate_2025": {
-      "label": "2025 returned-unit rate",
-      "value": 0.06325156964988826,
-      "unit": "ratio",
-      "scope": "FY2025, all channels"
+    "ExcludedInvalid": {
+      "value": 6208,
+      "unit": "count",
+      "label": "ExcludedInvalid",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     },
-    "revenue_yoy": {
-      "label": "Net revenue year-over-year",
-      "value": 0.027721866464039697,
-      "unit": "ratio",
-      "scope": "FY2025 versus FY2024, all channels"
+    "MissingCustomerRows": {
+      "value": 229201,
+      "unit": "count",
+      "label": "MissingCustomerRows",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     },
-    "paid_h1_margin": {
-      "label": "Paid Search H1 contribution margin",
-      "value": 0.42266433596827224,
-      "unit": "ratio",
-      "scope": "FY2025 H1, Paid Search"
-    },
-    "paid_h1_return_rate": {
-      "label": "Paid Search H1 returned-unit rate",
-      "value": 0.046285289747399705,
-      "unit": "ratio",
-      "scope": "FY2025 H1, Paid Search"
-    },
-    "paid_h1_discount_rate": {
-      "label": "Paid Search H1 discount share of gross sales",
-      "value": 0.049648278883311726,
-      "unit": "ratio",
-      "scope": "FY2025 H1, Paid Search"
-    },
-    "paid_h2_margin": {
-      "label": "Paid Search H2 contribution margin",
-      "value": 0.22704330267617712,
-      "unit": "ratio",
-      "scope": "FY2025 H2, Paid Search"
-    },
-    "paid_h2_return_rate": {
-      "label": "Paid Search H2 returned-unit rate",
-      "value": 0.15363586659376707,
-      "unit": "ratio",
-      "scope": "FY2025 H2, Paid Search"
-    },
-    "paid_h2_discount_rate": {
-      "label": "Paid Search H2 discount share of gross sales",
-      "value": 0.200000851307495,
-      "unit": "ratio",
-      "scope": "FY2025 H2, Paid Search"
+    "RepeatedLinePence": {
+      "value": 43171687,
+      "unit": "GBP pence",
+      "label": "RepeatedLinePence",
+      "scope": "2009-12-01 to 2011-12-09; deduplicated valid-price lines unless explicitly source/exclusion count"
     }
   },
-  "definitions": {
-    "net_revenue": "Gross sales minus discounts minus refunds",
-    "contribution": "Net revenue minus all original product cost and shipping; excludes acquisition cost, tax and fixed overhead",
-    "return_rate": "Returned units divided by sold units; lifetime returns attributed to order month",
-    "reporting_basis": "Retrospective order-cohort analysis; not an as-of cash or general-ledger report"
-  },
   "limitations": [
-    "No measured savings or causal effect",
-    "Returned goods assumed unsellable; original product cost retained",
-    "No advertising spend, customer IDs or causal experiment",
-    "Paid Search second-half discount and return pressure deliberately seeded",
-    "All AI interpretations require human review"
+    "Real historical records from a UK retailer; not current market conditions.",
+    "Exact repeated fields are removed as a disclosed analysis assumption; distinct identical purchases cannot be resolved from this source. RepeatedLinePence measures sensitivity to that choice.",
+    "C-prefixed invoices are cancellations, not necessarily completed cash refunds or matched physical returns.",
+    "No product costs, discounts, advertising channels, inventory balances or payment terms are available; no profit or AP aging is inferred.",
+    "Missing customers are retained for transaction value; customer analyses would require an identified-customer subset.",
+    "Final December is partial; do not compare it with full calendar months. Source prices are normalized to six decimal places to remove spreadsheet binary artifacts, then each line is rounded to pence half-up."
   ]
 }
