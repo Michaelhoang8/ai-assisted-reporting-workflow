@@ -1,0 +1,8 @@
+{
+  "dataset_id": "05f38a15b79643409e99e37c10a3ce7a5433b50beda958b6b8fc035fffa95eaa",
+  "raw_rows": 60006,
+  "accepted_rows": 60000,
+  "quarantined_rows": 6,
+  "checks_passed": 8,
+  "ai_summary_status": "current verified summary retained"
+}

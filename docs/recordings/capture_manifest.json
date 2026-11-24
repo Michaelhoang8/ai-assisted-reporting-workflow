@@ -1,0 +1,28 @@
+{
+  "captured_at": "2026-11-24T18:09:19.627992+00:00",
+  "source": "Actual reports/dashboard.html browser render",
+  "recording": "Automated browser walkthrough, not manual development footage",
+  "page_errors": [],
+  "screenshots": [
+    {
+      "file": "dashboard.png",
+      "sha256": "0a1b41a3a5c3a871af417d34bf0ebd9c35d5675b9cc554db6e68b9bee5d64f76"
+    },
+    {
+      "file": "filtered.png",
+      "sha256": "22f2b1b417b4bae54917871ff3187fdede8a124c96f9e4681a85a911820c942a"
+    },
+    {
+      "file": "detail-1.png",
+      "sha256": "22f2b1b417b4bae54917871ff3187fdede8a124c96f9e4681a85a911820c942a"
+    },
+    {
+      "file": "detail-2.png",
+      "sha256": "9beac3945ac89005e7c903ff3aa861525e4ee0d158ce0ee558338fc15136ba65"
+    },
+    {
+      "file": "detail-3.png",
+      "sha256": "ce982cea16437c6b3fcdfcdd6ff56691ab2594d4a32e8d7754588655f1614e52"
+    }
+  ]
+}

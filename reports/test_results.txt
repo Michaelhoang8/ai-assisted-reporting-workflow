@@ -1,0 +1,20 @@
+test_changed_data_invalidates_ai_artifacts (test_workflow.DataTests) ... ok
+test_conflicting_duplicate_fails (test_workflow.DataTests) ... ok
+test_discount_and_returns_rejected (test_workflow.DataTests) ... ok
+test_exact_duplicate_quarantined (test_workflow.DataTests) ... ok
+test_identical_data_same_fingerprint (test_workflow.DataTests) ... ok
+test_missing_price_not_zero (test_workflow.DataTests) ... ok
+test_partial_refund_rounding_and_contribution (test_workflow.DataTests) ... ok
+test_duplicate_claim_rejected (test_workflow.SummaryTests) ... ok
+test_numeric_prose_rejected (test_workflow.SummaryTests) ... ok
+test_stale_summary_rejected (test_workflow.SummaryTests) ... ok
+test_uncited_evidence_rejected (test_workflow.SummaryTests) ... ok
+test_unknown_metric_rejected (test_workflow.SummaryTests) ... ok
+test_valid_summary_passes (test_workflow.SummaryTests) ... ok
+test_wrong_unit_rejected (test_workflow.SummaryTests) ... ok
+test_wrong_value_rejected (test_workflow.SummaryTests) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.054s
+
+OK

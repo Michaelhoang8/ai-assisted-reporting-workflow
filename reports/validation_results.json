@@ -1,0 +1,10 @@
+{
+  "source_row_accounting": true,
+  "order_count": true,
+  "net_revenue_reconciles": true,
+  "refunds_reconcile": true,
+  "contribution_reconciles": true,
+  "category_revenue_reconciles": true,
+  "annual_revenue_reconciles": true,
+  "rates_bounded": true
+}

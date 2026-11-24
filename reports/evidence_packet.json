@@ -1,0 +1,121 @@
+{
+  "dataset_id": "05f38a15b79643409e99e37c10a3ce7a5433b50beda958b6b8fc035fffa95eaa",
+  "provenance": "Synthetic e-commerce data, seed 2026; not an employer dataset",
+  "metrics": {
+    "accepted_orders": {
+      "label": "Accepted orders",
+      "value": 60000,
+      "unit": "orders",
+      "scope": "All source dates"
+    },
+    "quality_exceptions": {
+      "label": "Quarantined source rows",
+      "value": 6,
+      "unit": "rows",
+      "scope": "All source dates"
+    },
+    "revenue_2024": {
+      "label": "2024 net revenue",
+      "value": 342955335,
+      "unit": "CAD cents",
+      "scope": "FY2024, all channels"
+    },
+    "contribution_2024": {
+      "label": "2024 contribution",
+      "value": 140450048,
+      "unit": "CAD cents",
+      "scope": "FY2024, all channels"
+    },
+    "margin_2024": {
+      "label": "2024 contribution margin",
+      "value": 0.4095286868769661,
+      "unit": "ratio",
+      "scope": "FY2024, all channels"
+    },
+    "return_rate_2024": {
+      "label": "2024 returned-unit rate",
+      "value": 0.04536604880650753,
+      "unit": "ratio",
+      "scope": "FY2024, all channels"
+    },
+    "revenue_2025": {
+      "label": "2025 net revenue",
+      "value": 352462697,
+      "unit": "CAD cents",
+      "scope": "FY2025, all channels"
+    },
+    "contribution_2025": {
+      "label": "2025 contribution",
+      "value": 140152490,
+      "unit": "CAD cents",
+      "scope": "FY2025, all channels"
+    },
+    "margin_2025": {
+      "label": "2025 contribution margin",
+      "value": 0.3976377959793005,
+      "unit": "ratio",
+      "scope": "FY2025, all channels"
+    },
+    "return_rate_2025": {
+      "label": "2025 returned-unit rate",
+      "value": 0.06325156964988826,
+      "unit": "ratio",
+      "scope": "FY2025, all channels"
+    },
+    "revenue_yoy": {
+      "label": "Net revenue year-over-year",
+      "value": 0.027721866464039697,
+      "unit": "ratio",
+      "scope": "FY2025 versus FY2024, all channels"
+    },
+    "paid_h1_margin": {
+      "label": "Paid Search H1 contribution margin",
+      "value": 0.42266433596827224,
+      "unit": "ratio",
+      "scope": "FY2025 H1, Paid Search"
+    },
+    "paid_h1_return_rate": {
+      "label": "Paid Search H1 returned-unit rate",
+      "value": 0.046285289747399705,
+      "unit": "ratio",
+      "scope": "FY2025 H1, Paid Search"
+    },
+    "paid_h1_discount_rate": {
+      "label": "Paid Search H1 discount share of gross sales",
+      "value": 0.049648278883311726,
+      "unit": "ratio",
+      "scope": "FY2025 H1, Paid Search"
+    },
+    "paid_h2_margin": {
+      "label": "Paid Search H2 contribution margin",
+      "value": 0.22704330267617712,
+      "unit": "ratio",
+      "scope": "FY2025 H2, Paid Search"
+    },
+    "paid_h2_return_rate": {
+      "label": "Paid Search H2 returned-unit rate",
+      "value": 0.15363586659376707,
+      "unit": "ratio",
+      "scope": "FY2025 H2, Paid Search"
+    },
+    "paid_h2_discount_rate": {
+      "label": "Paid Search H2 discount share of gross sales",
+      "value": 0.200000851307495,
+      "unit": "ratio",
+      "scope": "FY2025 H2, Paid Search"
+    }
+  },
+  "definitions": {
+    "net_revenue": "Gross sales minus discounts minus refunds",
+    "contribution": "Net revenue minus all original product cost and shipping; excludes acquisition cost, tax and fixed overhead",
+    "return_rate": "Returned units divided by sold units; lifetime returns attributed to order month",
+    "reporting_basis": "Retrospective order-cohort analysis; not an as-of cash or general-ledger report"
+  },
+  "limitations": [
+    "No measured savings or causal effect",
+    "Returned goods assumed unsellable; original product cost retained",
+    "No advertising spend, customer IDs or causal experiment",
+    "Paid Search second-half discount and return pressure deliberately seeded",
+    "All AI interpretations require human review"
+  ]
+}
